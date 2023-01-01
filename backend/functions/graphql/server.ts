@@ -1,14 +1,15 @@
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda";
 import { DynamoGameRepo, DynamoPuzzleFileRepo } from "../../dynamo";
+import { S3PuzzleFileReader } from "../../s3";
 import {
   IGameRepo,
   IPuzzleFileReader,
   IPuzzleFileRepo,
   StartGame,
 } from "../../core";
-import { GQLResolvers } from "./generated";
 import { schema } from "./schema";
+import { GQLResolvers } from "./generated";
 
 type Context = {
   gameRepo: IGameRepo;
@@ -60,6 +61,6 @@ export const handler = startServerAndCreateLambdaHandler(server, {
   context: async () => ({
     gameRepo: DynamoGameRepo(),
     puzzleFileRepo: DynamoPuzzleFileRepo(),
-    puzzleFileReader: {} as IPuzzleFileReader,
+    puzzleFileReader: S3PuzzleFileReader(),
   }),
 });
