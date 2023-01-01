@@ -5,6 +5,7 @@
     GQLPuzzleListQuery,
     GQLPuzzleListQueryVariables,
   } from "../../graphql/generated";
+  import Modal from "../../lib/Modal.svelte";
 
   const puzzleList = query<GQLPuzzleListQuery, GQLPuzzleListQueryVariables>(gql`
     query PuzzleList {
@@ -13,6 +14,12 @@
       }
     }
   `);
+
+  let puzzleToStart: string = null;
+
+  function openModal(puzzleId: string) {
+    puzzleToStart = puzzleId;
+  }
 </script>
 
 <main>
@@ -24,8 +31,16 @@
     <h1>Puzzles</h1>
     <ul>
       {#each $puzzleList.data.puzzles as puzzle}
-        <li>{puzzle.id}</li>
+        <li>
+          <div
+            on:click={() => openModal(puzzle.id)}
+            on:keypress={() => openModal(puzzle.id)}
+          >
+            {puzzle.id}
+          </div>
+        </li>
       {/each}
     </ul>
   {/if}
+  <Modal open={Boolean(puzzleToStart)} />
 </main>

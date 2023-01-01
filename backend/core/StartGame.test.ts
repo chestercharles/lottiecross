@@ -39,8 +39,6 @@ describe("StartGame", () => {
     await createGame({
       gameId,
       puzzleId: puzzleFile.id,
-      playerId: "playerId",
-      playerName: "playerName",
     });
 
     const newGame = await gameRepo.get(gameId);
@@ -48,7 +46,7 @@ describe("StartGame", () => {
     expect(newGame).toBeTruthy();
   });
 
-  it.skip("initializes a game from puzzle", async () => {
+  it("initializes a game from puzzle", async () => {
     const { gameRepo, puzzleFileRepo, createGame } = setup();
 
     const puzzleFile: IPuzzleFile = {
@@ -63,8 +61,6 @@ describe("StartGame", () => {
     await createGame({
       gameId,
       puzzleId: puzzleFile.id,
-      playerId: "playerId",
-      playerName: "playerName",
     });
 
     const newGame = await gameRepo.get(gameId);

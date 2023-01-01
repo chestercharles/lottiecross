@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -20,6 +21,16 @@ export type GQLGame = {
   puzzle?: Maybe<GQLPuzzle>;
 };
 
+export type GQLMutation = {
+  __typename?: 'Mutation';
+  startGame: GQLGame;
+};
+
+
+export type GQLMutationStartGameArgs = {
+  input: GQLStartGameInput;
+};
+
 export type GQLPuzzle = {
   __typename?: 'Puzzle';
   id: Scalars['String'];
@@ -29,6 +40,11 @@ export type GQLQuery = {
   __typename?: 'Query';
   games: Array<GQLGame>;
   puzzles: Array<GQLPuzzle>;
+};
+
+export type GQLStartGameInput = {
+  gameId: Scalars['String'];
+  puzzleId: Scalars['String'];
 };
 
 
@@ -102,8 +118,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type GQLResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Game: ResolverTypeWrapper<IGame>;
+  Mutation: ResolverTypeWrapper<{}>;
   Puzzle: ResolverTypeWrapper<IPuzzleFile>;
   Query: ResolverTypeWrapper<{}>;
+  StartGameInput: GQLStartGameInput;
   String: ResolverTypeWrapper<Scalars['String']>;
 };
 
@@ -111,8 +129,10 @@ export type GQLResolversTypes = {
 export type GQLResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Game: IGame;
+  Mutation: {};
   Puzzle: IPuzzleFile;
   Query: {};
+  StartGameInput: GQLStartGameInput;
   String: Scalars['String'];
 };
 
@@ -120,6 +140,10 @@ export type GQLGameResolvers<ContextType = any, ParentType extends GQLResolversP
   id?: Resolver<GQLResolversTypes['String'], ParentType, ContextType>;
   puzzle?: Resolver<Maybe<GQLResolversTypes['Puzzle']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GQLMutationResolvers<ContextType = any, ParentType extends GQLResolversParentTypes['Mutation'] = GQLResolversParentTypes['Mutation']> = {
+  startGame?: Resolver<GQLResolversTypes['Game'], ParentType, ContextType, RequireFields<GQLMutationStartGameArgs, 'input'>>;
 };
 
 export type GQLPuzzleResolvers<ContextType = any, ParentType extends GQLResolversParentTypes['Puzzle'] = GQLResolversParentTypes['Puzzle']> = {
@@ -134,6 +158,7 @@ export type GQLQueryResolvers<ContextType = any, ParentType extends GQLResolvers
 
 export type GQLResolvers<ContextType = any> = {
   Game?: GQLGameResolvers<ContextType>;
+  Mutation?: GQLMutationResolvers<ContextType>;
   Puzzle?: GQLPuzzleResolvers<ContextType>;
   Query?: GQLQueryResolvers<ContextType>;
 };

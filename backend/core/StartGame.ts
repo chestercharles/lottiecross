@@ -10,12 +10,7 @@ type ICreateGame = (deps: {
   gameRepo: IGameRepo;
   puzzleFileRepo: IPuzzleFileRepo;
   puzzleFileReader: IPuzzleFileReader;
-}) => (params: {
-  gameId: string;
-  puzzleId: string;
-  playerName: string;
-  playerId: string;
-}) => Promise<void>;
+}) => (params: { gameId: string; puzzleId: string }) => Promise<void>;
 
 export const StartGame: ICreateGame = (deps) => {
   return async function startGame(params) {
@@ -46,8 +41,6 @@ export const StartGame: ICreateGame = (deps) => {
   function initializeGame(
     params: {
       gameId: string;
-      playerId: string;
-      playerName: string;
       puzzleId: string;
     },
     puzzle: IPuzzle
@@ -55,12 +48,7 @@ export const StartGame: ICreateGame = (deps) => {
     return {
       id: params.gameId,
       puzzle,
-      players: [
-        {
-          id: params.playerId,
-          name: params.playerName,
-        },
-      ],
+      players: [],
     };
   }
 

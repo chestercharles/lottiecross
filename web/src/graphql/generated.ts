@@ -18,6 +18,16 @@ export type GQLGame = {
   puzzle?: Maybe<GQLPuzzle>;
 };
 
+export type GQLMutation = {
+  __typename?: 'Mutation';
+  startGame: GQLGame;
+};
+
+
+export type GQLMutationStartGameArgs = {
+  input: GQLStartGameInput;
+};
+
 export type GQLPuzzle = {
   __typename?: 'Puzzle';
   id: Scalars['String'];
@@ -27,6 +37,11 @@ export type GQLQuery = {
   __typename?: 'Query';
   games: Array<GQLGame>;
   puzzles: Array<GQLPuzzle>;
+};
+
+export type GQLStartGameInput = {
+  gameId: Scalars['String'];
+  puzzleId: Scalars['String'];
 };
 
 export type GQLPuzzleListQueryVariables = Exact<{ [key: string]: never; }>;

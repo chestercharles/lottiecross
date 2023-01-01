@@ -1,13 +1,19 @@
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda";
 import { DynamoGameRepo, DynamoPuzzleFileRepo } from "../../dynamo";
-import { IGameRepo, IPuzzleFileRepo } from "../../core";
+import {
+  IGameRepo,
+  IPuzzleFileReader,
+  IPuzzleFileRepo,
+  StartGame,
+} from "../../core";
 import { GQLResolvers } from "./generated";
 import { schema } from "./schema";
 
 type Context = {
   gameRepo: IGameRepo;
   puzzleFileRepo: IPuzzleFileRepo;
+  puzzleFileReader: IPuzzleFileReader;
 };
 
 const resolvers: GQLResolvers<Context> = {
@@ -17,6 +23,25 @@ const resolvers: GQLResolvers<Context> = {
     },
     games: async (_parent, _args, context) => {
       return context.gameRepo.find();
+    },
+  },
+  Mutation: {
+    startGame: async (_parent, args, context) => {
+      await StartGame({
+        gameRepo: context.gameRepo,
+        puzzleFileRepo: context.puzzleFileRepo,
+        puzzleFileReader: context.puzzleFileReader,
+      })({
+        puzzleId: args.input.puzzleId,
+        gameId: args.input.gameId,
+      });
+
+      const game = await context.gameRepo.get(args.input.gameId);
+      if (!game) {
+        throw new Error("Game not found");
+      }
+
+      return game;
     },
   },
   Game: {
@@ -35,5 +60,6 @@ export const handler = startServerAndCreateLambdaHandler(server, {
   context: async () => ({
     gameRepo: DynamoGameRepo(),
     puzzleFileRepo: DynamoPuzzleFileRepo(),
+    puzzleFileReader: {} as IPuzzleFileReader,
   }),
 });

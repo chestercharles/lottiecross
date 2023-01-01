@@ -12,4 +12,13 @@ export const schema = `#graphql
     puzzles: [Puzzle!]!
     games: [Game!]!
   }
+
+  input StartGameInput {
+    puzzleId: String!
+    gameId: String!
+  }
+
+  type Mutation {
+    startGame(input: StartGameInput!): Game!
+  }
 `;
