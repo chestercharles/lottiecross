@@ -4,14 +4,16 @@ import {
   Api as ApiGateway,
 } from "@serverless-stack/resources";
 import { Database } from "./Database";
+import { PuzzleBucket } from "./PuzzleBucket";
 
 export function GraphQL({ stack }: StackContext) {
   const table = use(Database);
+  const puzzleBucket = use(PuzzleBucket);
 
   const graphqlApi = new ApiGateway(stack, "graphql", {
     defaults: {
       function: {
-        bind: [table],
+        bind: [table, puzzleBucket],
       },
     },
     routes: {
@@ -25,7 +27,7 @@ export function GraphQL({ stack }: StackContext) {
   });
 
   stack.addOutputs({
-    GraphQlApi: graphqlApi.url,
+    url: graphqlApi.url,
   });
 
   return graphqlApi;

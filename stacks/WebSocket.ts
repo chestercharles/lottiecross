@@ -1,26 +1,16 @@
-import {
-  StackContext,
-  WebSocketApi,
-  use,
-  Table,
-} from "@serverless-stack/resources";
+import { StackContext, WebSocketApi, use } from "@serverless-stack/resources";
 import { Database } from "./Database";
+import { PuzzleBucket } from "./PuzzleBucket";
 
 export function WebSocket({ stack }: StackContext) {
-  const appTable = use(Database);
-
-  const websocketConnectionsTable = new Table(stack, "WebsocketConnections", {
-    fields: {
-      id: "string",
-    },
-    primaryIndex: { partitionKey: "id" },
-  });
+  const database = use(Database);
+  const puzzleBucket = use(PuzzleBucket);
 
   const websocketApi = new WebSocketApi(stack, "websocket", {
     accessLog: false,
     defaults: {
       function: {
-        bind: [appTable, websocketConnectionsTable],
+        bind: [database, puzzleBucket],
       },
     },
     routes: {
@@ -31,7 +21,7 @@ export function WebSocket({ stack }: StackContext) {
   });
 
   stack.addOutputs({
-    WebSocketApi: websocketApi.url,
+    url: websocketApi.url,
   });
 
   return websocketApi;

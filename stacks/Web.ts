@@ -17,6 +17,6 @@ export function Web({ stack }: StackContext) {
   });
 
   stack.addOutputs({
-    SITE: site.url,
+    url: site.url,
   });
 }

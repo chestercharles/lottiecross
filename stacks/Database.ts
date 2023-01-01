@@ -9,5 +9,9 @@ export function Database({ stack }: StackContext) {
     primaryIndex: { partitionKey: "PK", sortKey: "SK" },
   });
 
+  stack.addOutputs({
+    tableName: database.tableName,
+  });
+
   return database;
 }
