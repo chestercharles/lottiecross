@@ -9,7 +9,7 @@
     <span class="close" on:click={onRequestClose} on:keypress={onRequestClose}
       >&times;</span
     >
-    <p>Some text in the Modal..</p>
+    <slot />
   </div>
 </div>
 

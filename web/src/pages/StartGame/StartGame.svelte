@@ -4,18 +4,18 @@
 
   const puzzleList = getPuzzles();
 
-  let selectedPuzzleId = "";
-
+  $: selectedPuzzleId = "";
   function selectPuzzleId(puzzleId: string) {
     selectedPuzzleId = puzzleId;
   }
-
   function deselectPuzzleId() {
     selectedPuzzleId = "";
   }
 
-  function startGame(gameId: string) {
-    console.log("Starting game", gameId, " with puzzle", selectedPuzzleId);
+  $: gameId = "";
+  $: isStartingGame = false;
+  function startGame(params: { gameId: string; selectedPuzzleId: string }) {
+    isStartingGame = true;
   }
 
   $: isModalOpen = Boolean(selectedPuzzleId);
@@ -41,5 +41,30 @@
       {/each}
     </ul>
   {/if}
-  <Modal open={isModalOpen} onRequestClose={deselectPuzzleId} />
+  <Modal open={isModalOpen} onRequestClose={deselectPuzzleId}>
+    <form
+      on:submit={(e) => {
+        e.preventDefault();
+        startGame({
+          gameId,
+          selectedPuzzleId,
+        });
+      }}
+    >
+      <h3>Start {selectedPuzzleId}</h3>
+      <p>
+        Game ID: <input
+          placeholder="Spoon Unit Alpha"
+          type="text"
+          bind:value={gameId}
+        />
+      </p>
+      <button on:click={deselectPuzzleId}>Cancel</button>
+      {#if isStartingGame}
+        <button disabled>Starting...</button>
+      {:else}
+        <button type="submit">Start</button>
+      {/if}
+    </form>
+  </Modal>
 </main>
