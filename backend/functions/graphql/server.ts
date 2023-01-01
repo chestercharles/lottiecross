@@ -3,22 +3,7 @@ import { startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda";
 import { DynamoGameRepo, DynamoPuzzleFileRepo } from "../../dynamo";
 import { IGameRepo, IPuzzleFileRepo } from "../../core";
 import { GQLResolvers } from "./generated";
-
-export const schema = `#graphql
-  type Puzzle {
-    id: String!
-  }
-
-  type Game {
-    id: String!
-    puzzle: Puzzle
-  }
-
-  type Query {
-    puzzles: [Puzzle!]!
-    games: [Game!]!
-  }
-`;
+import { schema } from "./schema";
 
 type Context = {
   gameRepo: IGameRepo;

@@ -1,5 +1,5 @@
 overwrite: true
-schema: "backend/functions/graphql/server.ts"
+schema: "backend/functions/graphql/schema.ts"
 config:
   typesPrefix: GQL
 generates:
@@ -8,15 +8,12 @@ generates:
       - "typescript"
       - "typescript-resolvers"
     config:
-      wrapFieldDefinitions: true
-      enumsAsTypes: true
       mappers:
         Game: "@lottiecross/backend/core/types#IGame"
         Puzzle: "@lottiecross/backend/core/types#IPuzzleFile"
-  # web/src/graphql/generated.ts:
-  #   plugins:
-  #     - "typescript"
-  #     - "typescript-operations"
-  #   config:
-  #     wrapFieldDefinitions: true
-  #     enumsAsTypes: true
+  web/src/graphql/generated.ts:
+    documents:
+      - "web/src/**/!(*.d).{ts,svelte}"
+    plugins:
+      - "typescript"
+      - "typescript-operations"

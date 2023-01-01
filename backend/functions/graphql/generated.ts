@@ -5,7 +5,6 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type FieldWrapper<T> = T;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -17,19 +16,19 @@ export type Scalars = {
 
 export type GQLGame = {
   __typename?: 'Game';
-  id: FieldWrapper<Scalars['String']>;
-  puzzle?: Maybe<FieldWrapper<GQLPuzzle>>;
+  id: Scalars['String'];
+  puzzle?: Maybe<GQLPuzzle>;
 };
 
 export type GQLPuzzle = {
   __typename?: 'Puzzle';
-  id: FieldWrapper<Scalars['String']>;
+  id: Scalars['String'];
 };
 
 export type GQLQuery = {
   __typename?: 'Query';
-  games: Array<FieldWrapper<GQLGame>>;
-  puzzles: Array<FieldWrapper<GQLPuzzle>>;
+  games: Array<GQLGame>;
+  puzzles: Array<GQLPuzzle>;
 };
 
 

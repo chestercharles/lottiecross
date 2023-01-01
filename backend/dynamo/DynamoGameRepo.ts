@@ -1,4 +1,6 @@
 import { IGame, IGameRepo, IPuzzle } from "../core";
+import { DynamoDB } from "aws-sdk";
+import { Table } from "@serverless-stack/node/table";
 
 type DynamoGame = {
   PK: string;
@@ -15,9 +17,9 @@ type DynamoPlayer = {
 type DynamoResultSet = [DynamoGame, ...DynamoPlayer[]];
 
 export const DynamoGameRepo: () => IGameRepo = () => {
+  const dynamoDb = new DynamoDB.DocumentClient();
   return {
     get: async (gameId) => {
-      const { Table, dynamoDb } = await init();
       const results = await dynamoDb
         .query({
           TableName: Table.Database.tableName,
@@ -37,7 +39,6 @@ export const DynamoGameRepo: () => IGameRepo = () => {
       return game;
     },
     put: async (game) => {
-      const { Table, dynamoDb } = await init();
       const dynamoGame: DynamoGame = {
         PK: `GAME#${game.id}`,
         SK: `GAME#${game.id}`,
@@ -68,7 +69,6 @@ export const DynamoGameRepo: () => IGameRepo = () => {
         .promise();
     },
     find: async () => {
-      const { Table, dynamoDb } = await init();
       const results = await dynamoDb
         .scan({
           TableName: Table.Database.tableName,
@@ -122,11 +122,4 @@ function groupIntoDynamoResultSets(
   }
   resultSets.push(currentResultSet);
   return resultSets;
-}
-
-async function init() {
-  const { DynamoDB } = await import("aws-sdk");
-  const { Table } = await import("@serverless-stack/node/table");
-  const dynamoDb = new DynamoDB.DocumentClient();
-  return { Table, dynamoDb };
 }

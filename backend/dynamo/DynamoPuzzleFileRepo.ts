@@ -1,4 +1,6 @@
 import { IPuzzleFile, IPuzzleFileRepo } from "../core";
+import { DynamoDB } from "aws-sdk";
+import { Table } from "@serverless-stack/node/table";
 
 type DynamoPuzzle = {
   PK: string;
@@ -7,9 +9,9 @@ type DynamoPuzzle = {
 };
 
 export const DynamoPuzzleFileRepo: () => IPuzzleFileRepo = () => {
+  const dynamoDb = new DynamoDB.DocumentClient();
   return {
     get: async (puzzleId) => {
-      const { Table, dynamoDb } = await init();
       const results = await dynamoDb
         .get({
           TableName: Table.Database.tableName,
@@ -27,7 +29,6 @@ export const DynamoPuzzleFileRepo: () => IPuzzleFileRepo = () => {
       return makePuzzle(results.Item as DynamoPuzzle);
     },
     put: async (puzzle) => {
-      const { Table, dynamoDb } = await init();
       const dynamoPuzzle: DynamoPuzzle = {
         PK: `PUZZLE#${puzzle.id}`,
         SK: `PUZZLE#${puzzle.id}`,
@@ -38,7 +39,6 @@ export const DynamoPuzzleFileRepo: () => IPuzzleFileRepo = () => {
         .promise();
     },
     find: async () => {
-      const { Table, dynamoDb } = await init();
       const results = await dynamoDb
         .scan({
           TableName: Table.Database.tableName,
@@ -63,11 +63,4 @@ function makePuzzle(item: DynamoPuzzle): IPuzzleFile {
     id: item.PK.split("#")[1],
     path: item.path,
   };
-}
-
-async function init() {
-  const { DynamoDB } = await import("aws-sdk");
-  const { Table } = await import("@serverless-stack/node/table");
-  const dynamoDb = new DynamoDB.DocumentClient();
-  return { Table, dynamoDb };
 }
