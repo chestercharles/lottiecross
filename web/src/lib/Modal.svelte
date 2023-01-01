@@ -1,11 +1,14 @@
 <script lang="ts">
   export let open = false;
+  export let onRequestClose: () => void;
 </script>
 
 <!-- https://www.w3schools.com/howto/howto_css_modals.asp -->
 <div id="myModal" class="modal" class:open>
   <div class="modal-content">
-    <span class="close">&times;</span>
+    <span class="close" on:click={onRequestClose} on:keypress={onRequestClose}
+      >&times;</span
+    >
     <p>Some text in the Modal..</p>
   </div>
 </div>

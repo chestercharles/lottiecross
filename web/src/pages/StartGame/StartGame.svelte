@@ -1,25 +1,24 @@
 <script lang="ts">
-  import { gql } from "@apollo/client/core";
-  import { query } from "svelte-apollo";
-  import type {
-    GQLPuzzleListQuery,
-    GQLPuzzleListQueryVariables,
-  } from "../../graphql/generated";
   import Modal from "../../lib/Modal.svelte";
+  import { getPuzzles } from "./getPuzzles";
 
-  const puzzleList = query<GQLPuzzleListQuery, GQLPuzzleListQueryVariables>(gql`
-    query PuzzleList {
-      puzzles {
-        id
-      }
-    }
-  `);
+  const puzzleList = getPuzzles();
 
-  let puzzleToStart: string = null;
+  let selectedPuzzleId = "";
 
-  function openModal(puzzleId: string) {
-    puzzleToStart = puzzleId;
+  function selectPuzzleId(puzzleId: string) {
+    selectedPuzzleId = puzzleId;
   }
+
+  function deselectPuzzleId() {
+    selectedPuzzleId = "";
+  }
+
+  function startGame(gameId: string) {
+    console.log("Starting game", gameId, " with puzzle", selectedPuzzleId);
+  }
+
+  $: isModalOpen = Boolean(selectedPuzzleId);
 </script>
 
 <main>
@@ -33,8 +32,8 @@
       {#each $puzzleList.data.puzzles as puzzle}
         <li>
           <div
-            on:click={() => openModal(puzzle.id)}
-            on:keypress={() => openModal(puzzle.id)}
+            on:click={() => selectPuzzleId(puzzle.id)}
+            on:keypress={() => selectPuzzleId(puzzle.id)}
           >
             {puzzle.id}
           </div>
@@ -42,5 +41,5 @@
       {/each}
     </ul>
   {/if}
-  <Modal open={Boolean(puzzleToStart)} />
+  <Modal open={isModalOpen} onRequestClose={deselectPuzzleId} />
 </main>
