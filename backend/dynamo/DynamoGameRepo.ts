@@ -38,32 +38,39 @@ export const DynamoGameRepo: () => IGameRepo = () => {
 
       return game;
     },
-    put: async (game) => {
+    putPuzzle: async (gameId, puzzle) => {
       const dynamoGame: DynamoGame = {
-        PK: `GAME#${game.id}`,
-        SK: `GAME#${game.id}`,
-        puzzle: game.puzzle,
+        PK: `GAME#${gameId}`,
+        SK: `GAME#${gameId}`,
+        puzzle,
       };
-      const dynamoPlayers = game.players.map((player) => ({
-        PK: `GAME#${game.id}`,
+      await dynamoDb
+        .put({
+          TableName: Table.Database.tableName,
+          Item: dynamoGame,
+        })
+        .promise();
+    },
+    addPlayer: async (gameId, player) => {
+      const dynamoPlayer: DynamoPlayer = {
+        PK: `GAME#${gameId}`,
         SK: `PLAYER#${player.id}`,
         name: player.name,
-      }));
+      };
       await dynamoDb
-        .batchWrite({
-          RequestItems: {
-            [Table.Database.tableName]: [
-              {
-                PutRequest: {
-                  Item: dynamoGame,
-                },
-              },
-              ...dynamoPlayers.map((player) => ({
-                PutRequest: {
-                  Item: player,
-                },
-              })),
-            ],
+        .put({
+          TableName: Table.Database.tableName,
+          Item: dynamoPlayer,
+        })
+        .promise();
+    },
+    removePlayer: async (gameId, playerId) => {
+      await dynamoDb
+        .delete({
+          TableName: Table.Database.tableName,
+          Key: {
+            PK: `GAME#${gameId}`,
+            SK: `PLAYER#${playerId}`,
           },
         })
         .promise();

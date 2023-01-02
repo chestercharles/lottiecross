@@ -11,15 +11,15 @@ describe("LeaveGame", () => {
 
     const existingGame: IGame = {
       id: "gameId",
-      puzzleId: "puzzleId",
-      serializedGame: "serializedGame",
+      puzzle: {} as any,
       players: [
         { name: "Chester", id: playerToLeaveId },
         { name: "Katie", id: "987654321" },
       ],
     };
-
-    await gameRepo.put(existingGame);
+    await gameRepo.putPuzzle(existingGame.id, existingGame.puzzle);
+    await gameRepo.addPlayer(existingGame.id, existingGame.players[0]);
+    await gameRepo.addPlayer(existingGame.id, existingGame.players[1]);
 
     await LeaveGame({ gameRepo })({
       gameId: existingGame.id,

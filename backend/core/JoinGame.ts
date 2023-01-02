@@ -15,10 +15,8 @@ export const JoinGame: IJoinGame = (deps) => async (params) => {
     throw new Error("Game not found");
   }
 
-  game.players.push({
+  await deps.gameRepo.addPlayer(game.id, {
     name: params.playerName,
     id: params.playerId,
   });
-
-  deps.gameRepo.put(game);
 };

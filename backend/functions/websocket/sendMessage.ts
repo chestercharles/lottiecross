@@ -1,30 +1,32 @@
-import { ApiGatewayManagementApi } from "aws-sdk";
 import { APIGatewayProxyHandler } from "aws-lambda";
+import {
+  IGame,
+  RemoveDisconnectedPlayers,
+  SendGameUpdate,
+  UpdateGamePuzzleState,
+} from "core";
+import { DynamoGameRepo } from "dynamo";
+import { WebsocketPlayerService } from "websocket";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-  const messageData = JSON.parse(event.body!).data;
-  const { stage, domainName } = event.requestContext;
+  const messageData: {
+    gameId: string;
+    newState: string;
+  } = JSON.parse(event.body!).data;
 
-  const apiG = new ApiGatewayManagementApi({
-    endpoint: `${domainName}/${stage}`,
-  });
+  await RemoveDisconnectedPlayers({
+    playerService: WebsocketPlayerService(event),
+    gameRepo: DynamoGameRepo(),
+  })({ gameId: messageData.gameId });
 
-  const postToConnection = async function (id: string) {
-    try {
-      await apiG
-        .postToConnection({ ConnectionId: id, Data: messageData })
-        .promise();
-    } catch (e: any) {
-      if (e.statusCode === 410) {
-        // Remove stale connections
-        // await dynamoDb.delete({ TableName, Key: { id } }).promise();
-      }
-    }
-  };
+  await UpdateGamePuzzleState({
+    gameRepo: DynamoGameRepo(),
+  })({ gameId: messageData.gameId, newState: messageData.newState });
 
-  // await Promise.all(
-  //   allConnections.Items!.map((item) => postToConnection(item.id))
-  // );
+  await SendGameUpdate({
+    playerService: WebsocketPlayerService(event),
+    gameRepo: DynamoGameRepo(),
+  })({ gameId: messageData.gameId });
 
   return { statusCode: 200, body: "Message sent" };
 };

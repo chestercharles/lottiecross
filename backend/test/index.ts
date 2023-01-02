@@ -11,22 +11,57 @@ function clone<T extends {}>(obj: T): T {
 }
 
 export const InMemoryGameRepo: () => IGameRepo = () => {
-  let games: IGame[] = [];
+  let puzzleEntries: { gameId: string; puzzle: IGame["puzzle"] }[] = [];
+  let playerEntries: {
+    gameId: string;
+    player: { id: string; name: string };
+  }[] = [];
   return {
     async get(id) {
-      const game = games.find((game) => game.id === id);
-      if (game) {
-        return clone(game);
+      const puzzleEntry = puzzleEntries.find(
+        (puzzleEntry) => puzzleEntry.gameId === id
+      );
+
+      if (!puzzleEntry) {
+        return null;
       }
 
-      return null;
+      return {
+        id: puzzleEntry.gameId,
+        puzzle: puzzleEntry.puzzle,
+        players: playerEntries
+          .filter((playerEntry) => playerEntry.gameId === puzzleEntry.gameId)
+          .map((playerEntry) => playerEntry.player),
+      };
     },
     async find() {
-      return games.map((game) => clone(game));
+      return puzzleEntries.map((puzzleEntry) => {
+        return {
+          id: puzzleEntry.gameId,
+          puzzle: puzzleEntry.puzzle,
+          players: playerEntries
+            .filter((playerEntry) => playerEntry.gameId === puzzleEntry.gameId)
+            .map((playerEntry) => playerEntry.player),
+        };
+      });
     },
-    async put(newGame) {
-      games = games.filter((game) => game.id !== newGame.id);
-      games.push(clone(newGame));
+    async putPuzzle(gameId, puzzle) {
+      puzzleEntries = puzzleEntries.filter(
+        (puzzleEntry) => puzzleEntry.gameId !== gameId
+      );
+      puzzleEntries.push({ gameId, puzzle: clone(puzzle) });
+    },
+    async addPlayer(gameId, player) {
+      playerEntries.push({ gameId, player });
+    },
+    async removePlayer(gameId, playerId) {
+      const playerToRemoveIndex = playerEntries.findIndex(
+        (playerEntry) =>
+          playerEntry.gameId === gameId && playerEntry.player.id === playerId
+      );
+      if (playerToRemoveIndex !== -1) {
+        playerEntries.splice(playerToRemoveIndex, 1);
+      }
     },
   };
 };

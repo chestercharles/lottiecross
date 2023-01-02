@@ -9,6 +9,5 @@ export const LeaveGame: ILeaveGame = (deps) => async (params) => {
   if (!game) {
     throw new Error("Game not found");
   }
-  game.players = game.players.filter((player) => player.id !== params.playerId);
-  deps.gameRepo.put(game);
+  await deps.gameRepo.removePlayer(game.id, params.playerId);
 };

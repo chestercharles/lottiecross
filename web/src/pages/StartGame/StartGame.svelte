@@ -1,10 +1,36 @@
 <script lang="ts">
   import Modal from "../../lib/Modal.svelte";
-  import { getPuzzles } from "./getPuzzles";
+  import { push } from "svelte-spa-router";
+  import { gql } from "@apollo/client/core";
+  import { mutation, query } from "svelte-apollo";
+  import type {
+    GQLPuzzleListQuery,
+    GQLPuzzleListQueryVariables,
+    GQLStartGameMutation,
+    GQLStartGameMutationVariables,
+  } from "../../graphql/generated";
 
-  const puzzleList = getPuzzles();
+  const puzzleList = query<GQLPuzzleListQuery, GQLPuzzleListQueryVariables>(gql`
+    query PuzzleList {
+      puzzles {
+        id
+      }
+    }
+  `);
 
-  $: selectedPuzzleId = "";
+  const startGameMutation = mutation<
+    GQLStartGameMutation,
+    GQLStartGameMutationVariables
+  >(
+    gql`
+      mutation StartGame($input: StartGameInput!) {
+        startGame(input: $input) {
+          id
+        }
+      }
+    `
+  );
+
   function selectPuzzleId(puzzleId: string) {
     selectedPuzzleId = puzzleId;
   }
@@ -12,12 +38,24 @@
     selectedPuzzleId = "";
   }
 
-  $: gameId = "";
-  $: isStartingGame = false;
-  function startGame(params: { gameId: string; selectedPuzzleId: string }) {
-    isStartingGame = true;
+  async function startGame(params: {
+    gameId: string;
+    selectedPuzzleId: string;
+  }) {
+    const result = await startGameMutation({
+      variables: {
+        input: {
+          gameId: params.gameId,
+          puzzleId: params.selectedPuzzleId,
+        },
+      },
+    });
+    push(`/game/${result.data.startGame.id}`);
   }
 
+  $: gameId = "";
+  $: isStartingGame = false;
+  $: selectedPuzzleId = "";
   $: isModalOpen = Boolean(selectedPuzzleId);
 </script>
 
@@ -45,6 +83,7 @@
     <form
       on:submit={(e) => {
         e.preventDefault();
+        isStartingGame = true;
         startGame({
           gameId,
           selectedPuzzleId,

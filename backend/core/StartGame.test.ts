@@ -5,7 +5,7 @@ import {
   MockPuzzleFileReader,
 } from "../test";
 import { StartGame } from "./StartGame";
-import { IPuzzle, IPuzzleFile } from "./types";
+import { IPuzzleFile } from "./types";
 
 describe("StartGame", () => {
   function setup() {

@@ -6,7 +6,7 @@ import NotFound from "./lib/NotFound.svelte";
 const routes = {
   "/": Home,
   "/start-game": StartGame,
-  "/join-game": JoinGame,
+  "/game/:gameId": JoinGame,
   "*": NotFound,
 };
 

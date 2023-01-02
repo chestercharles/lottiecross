@@ -20,6 +20,8 @@ export function WebSocket({ stack }: StackContext) {
     },
   });
 
+  websocketApi.attachPermissions(["execute-api"]);
+
   stack.addOutputs({
     url: websocketApi.url,
   });

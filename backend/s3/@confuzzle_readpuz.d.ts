@@ -1,5 +1,3 @@
-// <reference types="node" />
-
 declare module "@confuzzle/readpuz" {
   export type ConfuzzlePuzzle = {
     title: string;

@@ -44,6 +44,13 @@ export type GQLStartGameInput = {
   puzzleId: Scalars['String'];
 };
 
+export type GQLStartGameMutationVariables = Exact<{
+  input: GQLStartGameInput;
+}>;
+
+
+export type GQLStartGameMutation = { __typename?: 'Mutation', startGame: { __typename?: 'Game', id: string } };
+
 export type GQLPuzzleListQueryVariables = Exact<{ [key: string]: never; }>;
 
 

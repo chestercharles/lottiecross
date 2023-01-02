@@ -1,6 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import { JoinGame } from "core";
+import { JoinGame, RemoveDisconnectedPlayers, SendGameUpdate } from "core";
 import { DynamoGameRepo } from "dynamo";
+import { WebsocketPlayerService } from "websocket";
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   const playerId = event.requestContext.connectionId;
@@ -18,11 +19,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return { statusCode: 400, body: "Missing gameId" };
   }
 
+  await RemoveDisconnectedPlayers({
+    playerService: WebsocketPlayerService(event),
+    gameRepo: DynamoGameRepo(),
+  })({ gameId });
+
   await JoinGame({ gameRepo: DynamoGameRepo() })({
     gameId,
     playerName,
     playerId,
   });
 
-  return { statusCode: 200, body: "Connected" };
+  await SendGameUpdate({
+    playerService: WebsocketPlayerService(event),
+    gameRepo: DynamoGameRepo(),
+  })({ gameId });
+
+  const game = await DynamoGameRepo().get(gameId);
+
+  if (!game) {
+    throw new Error("Game not found");
+  }
+
+  return { statusCode: 200, body: JSON.stringify(game) };
 };

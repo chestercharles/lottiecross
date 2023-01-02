@@ -16,8 +16,7 @@ export const StartGame: ICreateGame = (deps) => {
   return async function startGame(params) {
     await assertGameIdIsNotInUse(params.gameId);
     const puzzle = await getPuzzle(params.puzzleId);
-    const newGame = initializeGame(params, puzzle);
-    await save(newGame);
+    await deps.gameRepo.putPuzzle(params.gameId, puzzle);
   };
 
   async function assertGameIdIsNotInUse(gameId: string) {
@@ -36,23 +35,5 @@ export const StartGame: ICreateGame = (deps) => {
     }
 
     return deps.puzzleFileReader.readFile(puzzleFile.path);
-  }
-
-  function initializeGame(
-    params: {
-      gameId: string;
-      puzzleId: string;
-    },
-    puzzle: IPuzzle
-  ): IGame {
-    return {
-      id: params.gameId,
-      puzzle,
-      players: [],
-    };
-  }
-
-  async function save(game: IGame) {
-    await deps.gameRepo.put(game);
   }
 };

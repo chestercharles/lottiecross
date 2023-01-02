@@ -23,9 +23,14 @@ export type IPuzzleFile = {
 };
 
 export interface IGameRepo {
-  get(id: string): Promise<IGame | null>;
+  get(gameId: string): Promise<IGame | null>;
   find(): Promise<IGame[]>;
-  put(game: IGame): Promise<void>;
+  putPuzzle(gameId: string, puzzle: IGame["puzzle"]): Promise<void>;
+  addPlayer(
+    gameId: string,
+    player: { name: string; id: string }
+  ): Promise<void>;
+  removePlayer(gameId: string, playerId: string): Promise<void>;
 }
 
 export interface IPuzzleFileRepo {
@@ -43,6 +48,7 @@ export interface IPuzzleFileReader {
   readFile(file: string): Promise<IPuzzle>;
 }
 
-export interface ICollaborationService {
-  broadcastMove(playerId: string, move: Move): Promise<void>;
+export interface IPlayerService {
+  sendGameUpdate(playerId: string, game: IGame): Promise<void>;
+  isPlayerStillConnected(playerId: string): Promise<boolean>;
 }
